@@ -5,8 +5,8 @@
 - Launch CloudShell
 - Install eksctl and kubectl [Reference](https://github.com/ad1mohan/How-to-AWS/tree/main/How-to-install-eksctl-and-kubectl-in-AWS-CloudShell)
 - Create EKS Cluster without node group [Reference](https://github.com/ad1mohan/How-to-AWS/tree/main/How-to-create-EKS-cluster-using-AWS-CloudShell)
-- Associate IAM OIDC provider
-- Create a keypair using AWS CLI to be used to SSH into nodes
+- Associate IAM OIDC provider [Reference](https://github.com/ad1mohan/How-to-AWS/tree/main/How-to-create-EKS-cluster-using-AWS-CloudShell-and-associate-IAM-OIDC-provider)
+- Create a keypair using AWS CLI to be used to SSH into nodes [Reference](https://github.com/ad1mohan/How-to-AWS/tree/main/How-to-create-key-pair-using-AWS-CLI)
 ```
 # To install eksctl
 curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname  -s)_amd64.tar.gz" | tar xz -C /tmp
