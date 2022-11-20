@@ -1,7 +1,8 @@
 # Create EKS cluster using AWS CloudShell
 
-## Step-01: Install eksctl and kubectl
-- Paste below command in CloudShell
+## Step-01: Complete pre-requisite (commands pasted below)
+- Launch CloudShell
+- Install eksctl and kubectl [Reference](https://github.com/ad1mohan/How-to-AWS/tree/main/How-to-install-eksctl-and-kubectl-in-AWS-CloudShell)
 ```
 # To install eksctl
 curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname  -s)_amd64.tar.gz" | tar xz -C /tmp
