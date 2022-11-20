@@ -45,11 +45,6 @@ eksctl get iamserviceaccount --cluster=test-cluster-1
 
 # To download IAM Policy File
 curl -o iam_policy_latest.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
- 
-# Create IAM Policy using policy downloaded 
-aws iam create-policy \
-     --policy-name AWSLoadBalancerControllerIAMPolicy \
-     --policy-document file://iam_policy_latest.json
 
 # To Create IAM Service Account using same policy created above
 eksctl create iamserviceaccount \
@@ -81,7 +76,9 @@ helm repo add eks https://aws.github.io/eks-charts
 
 # Update your local repo to make sure that you have the most recent charts.
 helm repo update
-
+```
+Change below `<VPC_ID>` with vpc id in which cluster is created.
+```
 # To install aws lb controller
 ## Replace Cluster Name, Region Code, VPC ID, Image Repo Account ID and Region Code  
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
@@ -90,8 +87,13 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   --set serviceAccount.create=false \
   --set serviceAccount.name=aws-load-balancer-controller \
   --set region=us-east-1 \
-  --set vpcId=vpc-082b77566e990153b \
+  --set vpcId=vpc-<VPC_ID> \
   --set image.repository=602401143452.dkr.ecr.us-east-1.amazonaws.com/amazon/aws-load-balancer-controller
+
+```
+
+Below are files used to create deployments and LBs
+```
 # To create a folder to keep yamls
 mkdir ./yamls
 
