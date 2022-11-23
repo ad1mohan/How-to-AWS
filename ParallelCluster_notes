@@ -1,0 +1,12 @@
+```
+# Setup Virtual Env in C9 or in any instance and run below commands
+
+# To create cluster config file
+pcluster configure --config cluster-testing.yaml
+
+# create vpc with vpc and more and enable auto assign public IP.
+
+# To create parallel cluster
+pcluster create-cluster --cluster-configuration cluster-testing.yaml --cluster-name pllc-testing --region us-east-1
+
+```
