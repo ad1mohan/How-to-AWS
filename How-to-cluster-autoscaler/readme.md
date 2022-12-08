@@ -66,7 +66,7 @@ eksctl create nodegroup --cluster=test-cluster-1 \
              --appmesh-access \
              --alb-ingress-access --dry-run
 ```
-## Install KUBE-OPS-VIEW
+## Install KUBE-OPS-VIEW (Deprecated)
 ```sh
 # Install Open SSL
 sudo yum install openssl -y
@@ -93,4 +93,26 @@ helm list
 
 kubectl get svc kube-ops-view | tail -n 1 | awk '{ print "Kube-ops-view URL = http://"$4 }'
 ```
-```
+## CONFIGURE HORIZONTAL POD AUTOSCALER
+```sh
+# We will deploy the metrics server using Kubernetes Metrics Server.
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.5.0/components.yaml
+
+# Lets' verify the status of the metrics-server APIService
+kubectl get apiservice v1beta1.metrics.k8s.io -o json | jq '.status'
+
+# Deploy a Sample App
+# The application is a custom-built image based on the php-apache image. The index.php page performs calculations to generate CPU load.
+kubectl create deployment php-apache --image=us.gcr.io/k8s-artifacts-prod/hpa-example
+kubectl set resources deploy php-apache --requests=cpu=200m
+kubectl expose deploy php-apache --port 80
+
+kubectl get pod -l app=php-apache
+
+# This HPA scales up when CPU exceeds 50% of the allocated container resource.
+kubectl autoscale deployment php-apache `#The target average CPU utilization` \
+    --cpu-percent=50 \
+    --min=1 `#The lower limit for the number of pods that can be set by the autoscaler` \
+    --max=10 `#The upper limit for the number of pods that can be set by the autoscaler`
+
+# 
