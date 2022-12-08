@@ -66,3 +66,31 @@ eksctl create nodegroup --cluster=test-cluster-1 \
              --appmesh-access \
              --alb-ingress-access --dry-run
 ```
+## Install KUBE-OPS-VIEW
+```sh
+# Install Open SSL
+sudo yum install openssl -y
+
+# Install Helm
+curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > get_helm.sh
+chmod 700 get_helm.sh
+./get_helm.sh
+# Bash completion for the helm
+helm completion bash >> ~/.bash_completion
+. /etc/profile.d/bash_completion.sh
+. ~/.bash_completion
+source <(helm completion bash)
+helm version --short
+
+# install k-ops
+helm repo add stable https://charts.helm.sh/stable
+helm install kube-ops-view \
+stable/kube-ops-view \
+--set service.type=LoadBalancer \
+--set rbac.create=True
+
+helm list
+
+kubectl get svc kube-ops-view | tail -n 1 | awk '{ print "Kube-ops-view URL = http://"$4 }'
+```
+```
