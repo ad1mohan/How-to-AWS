@@ -30,6 +30,7 @@ eksctl version
 
 # kubectl version
 kubectl version
+
 ```
 ## Create cluster
 ```sh
@@ -65,6 +66,7 @@ eksctl create nodegroup --cluster=test-cluster-1 \
              --full-ecr-access \
              --appmesh-access \
              --alb-ingress-access
+             
 ```
 ## Install KUBE-OPS-VIEW (Deprecated)
 ```sh
