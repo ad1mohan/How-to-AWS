@@ -64,7 +64,7 @@ eksctl create nodegroup --cluster=test-cluster-1 \
              --external-dns-access \
              --full-ecr-access \
              --appmesh-access \
-             --alb-ingress-access --dry-run
+             --alb-ingress-access
 ```
 ## Install KUBE-OPS-VIEW (Deprecated)
 ```sh
