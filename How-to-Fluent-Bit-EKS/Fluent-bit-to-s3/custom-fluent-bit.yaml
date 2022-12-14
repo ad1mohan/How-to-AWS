@@ -1,0 +1,181 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: amazon-cloudwatch
+  labels:
+    name: amazon-cloudwatch
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fluent-bit
+  namespace: amazon-cloudwatch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fluent-bit-role
+rules:
+  - nonResourceURLs:
+      - /metrics
+    verbs:
+      - get
+  - apiGroups: ["", "extensions", "apps"]
+    resources:
+      - namespaces
+      - pods
+      - pods/logs
+      - nodes
+      - nodes/proxy
+      - deployments
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: fluent-bit-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: fluent-bit-role
+subjects:
+  - kind: ServiceAccount
+    name: fluent-bit
+    namespace: amazon-cloudwatch
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit
+  namespace: amazon-cloudwatch
+  labels:
+    app: fluent-bit
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Parsers_File parsers.conf
+
+    @INCLUDE input-*.conf
+    @INCLUDE output-*.conf
+
+    @INCLUDE filters.conf
+  
+  parsers.conf: |
+    [PARSER]
+        Name        s3_logs
+        Format      json
+        Time_Key    requestReceivedTimestamp
+        Time_Format %Y-%m-%dT%H:%M:%S.%LZ
+        Time_Keep   On
+    
+    [PARSER]
+        Name        kubernetes-tag
+        Format      regex
+        Regex       (?default.+)\.(?random-log-generator-deployment-65db8c9894-jxqxj.+)\.(?random-log-generator.+)
+
+
+  input-s3logs.conf: |
+    [INPUT]
+        Name              tail
+        Tag               kube.default.random-log-generator-deployment-65db8c9894-jxqxj.random-log-generator
+        Tag_Regex         (?random-log-generator-deployment-65db8c9894-jxqxj[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*)_(?default[^_]+)_(?random-log-generator.+)-
+        Path              /var/log/containers/random-log-generator-deployment*.log
+        Exclude_Path      /var/log/containers/*_amazon-cloudwatch_*.log
+        Parser            s3_logs
+        DB                /var/log/flb_kube.db
+        Mem_Buf_Limit     5MB
+        Skip_Long_Lines   On
+        Refresh_Interval  10
+
+
+  output-s3.conf: |
+    [OUTPUT]
+        Name s3
+        Match *
+        bucket fahiuhf6fsdf
+        region us-east-1
+        use_put_object On
+        s3_key_format /$TAG[1]/$TAG[3]/%Y/%m/%d/
+        s3_key_format_tag_delimiters . 
+        total_file_size 1M
+        upload_timeout 1m
+    
+    [OUTPUT]
+        Name  stdout
+        Match *
+
+  filters.conf: |
+    [FILTER]
+        Name                kubernetes
+        Match               kube.*
+        Kube_URL            https://kubernetes.default.svc:443
+        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+        Kube_Tag_Prefix     kube.
+        Merge_Log           On
+        Merge_Log_Key       log_processed
+        K8S-Logging.Parser  On
+        K8S-Logging.Exclude On
+        Regex_Parser        kubernetes-tag
+        Labels              Off
+        Annotations         Off
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluent-bit
+  namespace: amazon-cloudwatch
+  labels:
+    k8s-app: fluent-bit
+    version: v1
+    kubernetes.io/cluster-service: "true"
+spec:
+  selector:
+    matchLabels:
+      k8s-app: fluent-bit
+  template:
+    metadata:
+      labels:
+        k8s-app: fluent-bit
+        version: v1
+        kubernetes.io/cluster-service: "true"
+    spec:
+      containers:
+      - name: fluent-bit
+        image: public.ecr.aws/aws-observability/aws-for-fluent-bit:stable
+        imagePullPolicy: Always
+        env:
+        - name: AWS_REGION
+          value: us-east-1
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: fluentbit-s3-key
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: fluentbit-s3-key
+              key: AWS_SECRET_ACCESS_KEY
+        volumeMounts:
+        - name: fluentbitconfigvol
+          mountPath: /etc/fluent-bit/conf/
+        - name: varlog
+          mountPath: /var/log
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+        command: ["/fluent-bit/bin/fluent-bit"]
+        args: ["-c", "/etc/fluent-bit/conf/fluent-bit.conf"]
+      imagePullSecrets:
+      - name: aws-registry
+      volumes:
+      - name: fluentbitconfigvol
+        configMap:
+          name: fluent-bit
+      - name: varlog
+        hostPath:
+          path: /var/log
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/lib/docker/containers
