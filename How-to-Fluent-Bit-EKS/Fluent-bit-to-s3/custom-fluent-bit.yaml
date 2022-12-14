@@ -165,8 +165,6 @@ spec:
         - name: varlibdockercontainers
           mountPath: /var/lib/docker/containers
           readOnly: true
-        command: ["/fluent-bit/bin/fluent-bit"]
-        args: ["-c", "/etc/fluent-bit/conf/fluent-bit.conf"]
       imagePullSecrets:
       - name: aws-registry
       volumes:
