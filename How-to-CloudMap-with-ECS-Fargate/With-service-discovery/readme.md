@@ -32,29 +32,29 @@ We are going to implement the above environment
         - Rest all defaults
 - Verify in AWS Cloud Map about the newly created Namespace, Service and registered Service Instance for Notification Microservice. 
 
-## Step-4: User Management Microservice - Update Task Definition 
+## Step-2: User Management Microservice - Update Task Definition 
 - Update User Management Microservice Task definition, respective container definition environment variables of Notificaiton service host and port. 
 - **Configure Container Definition**
     - **Environment Variables**
         - NOTIFICATION_SERVICE_HOST=notification-service.microservices.local
         - NOTIFICATION_SERVICE_PORT=8096
 
-## Step-5: User Management Microservice - Update Service
+## Step-3: User Management Microservice - Update Service
 - Update the User Management Microservice ECS Service **svc-usermgmt-microservice** with new updated version of task defintion.
 
-## Step-6: Test User Management Microservices using Postman
+## Step-4: Test User Management Microservices using Postman
 ### User Management Service
 - **Create User**
     - Verify the email id to confirm account creation email received.
 - **List User**   
     - Verify if newly created user got listed. 
 
-## Step-7: Increase Number of Tasks to 4 in Notification Microservice ECS Service.
+## Step-5: Increase Number of Tasks to 4 in Notification Microservice ECS Service.
 - Increase Number of Tasks to 4 in Notification Microservice ECS Service.
     - ECS Service Name: svc-notification-microservice-Service-Discovery
 - Verify in AWS Cloud Map about the newly registered Service Instances for Notification Microservice. 
 
-## Step-8: Additional Observations
+## Step-6: Additional Observations
 - Now the request from User Management Microservice to Notification Microservice is local to VPC and not via internet or using any private internal load balancer.
 - In this approach we really dont see Elastic load balancing.
 - One service will call other service with service name and those service names are DNS registered in private DNS hosted zone with record set.
@@ -69,7 +69,7 @@ We are going to implement the above environment
 - For additional reference about **Route53 Multivalue Routing Policy** refer below link.
 - **Documentation Reference:** https://aws.amazon.com/premiumsupport/knowledge-center/multivalue-versus-simple-policies/
 
-## Step-9: Clean Up Resources
+## Step-7: Clean Up Resources
 - Update the following ECS services **Number Of Tasks** to 0
     - svc-usermgmt-microservice
     - svc-notification-microservice
