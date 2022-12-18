@@ -191,7 +191,7 @@
     - AppMesh endpoints: Vitual Node
     - Application container name: usermanagement-microservice
     - Virtual node name: usermgmt-vnode
-    - Virtual node port: 8096
+    - Virtual node port: 8095
 - **Envoy Container Special Settings**
     - ENVOY_LOG_LEVEL: trace
     - ENABLE_ENVOY_XRAY_TRACING: 1
