@@ -124,7 +124,7 @@
 
 ## Step-6: Notification Microservice - Create Virtual Node & Virtual Service
 - **Virtual Node:**
-    - Virtual Node Name:notification-vnode
+    - Virtual Node Name: notification-vnode
     - Service Discovery Method: DNS
     - DNS Hostname: notification-service.stacksimplify-dev.com
     - Backend: Nothing
@@ -166,6 +166,11 @@
     - Log Configuration: Enabled
 - **Service Integration**
     - Enable App Mesh Integration: Checked
+    - Mesh name: microservices-mesh
+    - AppMesh endpoints: Vitual Node
+    - Application container name: notification-microservice
+    - Virtual node name: notification-vnode
+    - Virtual node port: 8096
 - **Envoy Container Special Settings**
     - ENVOY_LOG_LEVEL: trace
     - ENABLE_ENVOY_XRAY_TRACING: 1
