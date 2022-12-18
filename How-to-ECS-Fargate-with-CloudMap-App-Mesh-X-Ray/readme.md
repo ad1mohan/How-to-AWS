@@ -64,10 +64,15 @@ AWS_MAIL_SERVER_FROM_ADDRESS = use-a-valid-email@gmail.com
 - **Important Note:** We need to ensure all the emails (FromAddress email) and (ToAddress emails) to be verified here. 
     - Reference Link: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html    
 
-## Step-4: Create Application Load Balancer
+## Step-4:  Create Application Load Balancer
 - **Create Application Load Balancer**
-    - Name: microservices-alb
-    - Availability Zones: ecs-vpc:  us-east-1a, us-east-1b
+    - Name: microservices-appmesh-alb
+    - Availability Zones: ecs-vpc:  ap-south-1a, ap-south-1b
     - Security Group: microservices-sg-alb (Inbound: Port 80)
-    - Target Group: temp-tg-micro (Rest all defaults)
-
+    - Target Group: temp-tg-microappmesh (Rest all defaults)
+- **DNS register the LB URL** with a custom domain name something like "appmesh.stacksimplify.com" in Route53. 
+    - Gather the DNS Name of "microservices-appmesh-alb"
+    - Create a Record set in Hosted Zone
+        - Record Set Name: appmesh.stacksimplify.com
+        - Alias: Yes
+        - Alias Name: microservices-appmesh-alb url
