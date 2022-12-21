@@ -53,5 +53,6 @@ spec:
         ports:
         - containerPort: 80
 eof
+kubectl apply -f log-app-deployment.yaml
 
 ```
