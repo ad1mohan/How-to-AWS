@@ -6,8 +6,9 @@ metadata:
   name: sample-pod-name
 spec:
   containers:
-    - args:
-        - "3600"
-      image: ad1mohan/alpine-sleeper
+    - commands:
+        - "sleep"
+        - "60"
+      image: nginx
       name: simple-sleeper-container
 ```
