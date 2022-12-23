@@ -4,6 +4,8 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: sample-pod-name
+  labels:
+    tier: frontend
 spec:
   containers:
     - commands:
