@@ -60,3 +60,10 @@ spec:
             - sleep
             - "3600"
 ```
+## NAMESPACE
+```
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: namespace-namespace
+```
