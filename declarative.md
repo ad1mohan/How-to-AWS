@@ -67,3 +67,19 @@ kind: Namespace
 metadata:
   name: namespace-namespace
 ```
+## CONFIG MAP
+```
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sample-configmap
+data:
+  game.properties: |
+    enemies=aliens
+    lives=3
+    enemies.cheat=true
+    enemies.cheat.level=noGoodRotten
+  ui.properties: |
+    color.good=purple
+    color.bad=yellow
+```
