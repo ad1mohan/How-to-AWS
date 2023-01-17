@@ -38,14 +38,14 @@ aws iam create-policy \
     --policy-name AmazonEKS_EFS_CSI_Driver_Policy \
     --policy-document file://iam-policy-example.json
 
-# Create Service account (Replace my-cluster, 111122223333 and region-code)
+# Create Service account (Replace test-cluster-1, 111122223333 and us-east-1)
 eksctl create iamserviceaccount \
-    --cluster my-cluster \
+    --cluster test-cluster-1 \
     --namespace kube-system \
     --name efs-csi-controller-sa \
     --attach-policy-arn arn:aws:iam::111122223333:policy/AmazonEKS_EFS_CSI_Driver_Policy \
     --approve \
-    --region region-code
+    --region us-east-1
 
 # Install the Amazon EFS driver using helm
 helm repo add aws-efs-csi-driver https://kubernetes-sigs.github.io/aws-efs-csi-driver/
@@ -58,5 +58,46 @@ helm upgrade -i aws-efs-csi-driver aws-efs-csi-driver/aws-efs-csi-driver \
     --set controller.serviceAccount.create=false \
     --set controller.serviceAccount.name=efs-csi-controller-sa
 
+# Create an Amazon EFS file system
+# Retrieve the VPC ID that your cluster is in and store it in a variable for use in a later step. Replace test-cluster-1 with your cluster name
+vpc_id=$(aws eks describe-cluster \
+    --name test-cluster-1 \
+    --query "cluster.resourcesVpcConfig.vpcId" \
+    --output text)
 
+# Retrieve the CIDR range for your cluster's VPC and store it in a variable for use in a later step. Replace us-east-1 with the AWS Region that your cluster is in.
+cidr_range=$(aws ec2 describe-vpcs \
+    --vpc-ids $vpc_id \
+    --query "Vpcs[].CidrBlock" \
+    --output text \
+    --region us-east-1)
+
+# Create a security group with an inbound rule that allows inbound NFS traffic for your Amazon EFS mount points.
+security_group_id=$(aws ec2 create-security-group \
+    --group-name MyEfsSecurityGroup \
+    --description "My EFS security group" \
+    --vpc-id $vpc_id \
+    --output text)
+
+# Create an inbound rule that allows inbound NFS traffic from the CIDR for your cluster's VPC.
+aws ec2 authorize-security-group-ingress \
+    --group-id $security_group_id \
+    --protocol tcp \
+    --port 2049 \
+    --cidr $cidr_range
+
+# Create an Amazon EFS file system for your Amazon EKS cluster
+file_system_id=$(aws efs create-file-system \
+    --region us-east-1 \
+    --performance-mode generalPurpose \
+    --query 'FileSystemId' \
+    --output text)
+
+# Create mount targets.
+# Determine the IDs of the subnets in your VPC and which Availability Zone the subnet is in.
+aws efs create-mount-target \
+    --file-system-id $file_system_id \
+    --subnet-id subnet-EXAMPLEe2ba886490 \
+    --security-groups $security_group_id
 ```
+https://docs.aws.amazon.com/eks/latest/userguide/efs-csi.html#:~:text=security%2Dgroups%20%24security_group_id-,Deploy%20a%20sample%20application,-You%20can%20deploy
