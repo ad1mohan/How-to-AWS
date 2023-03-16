@@ -117,7 +117,7 @@ spec:
     spec:
       containers:
         - name: app1-nginx
-          image: stacksimplify/kube-nginxapp1:1.0.0
+          image: ad1mohan/interactive-application:v1.0
           ports:
             - containerPort: 80
 EOF
@@ -161,7 +161,7 @@ spec:
     spec:
       containers:
         - name: app2-nginx
-          image: stacksimplify/kube-nginxapp2:1.0.0
+          image: ad1mohan/interactive-application-1:v1.0
           ports:
             - containerPort: 80
 EOF
@@ -205,7 +205,7 @@ spec:
     spec:
       containers:
         - name: app3-nginx
-          image: stacksimplify/kubenginx:1.0.0
+          image: ad1mohan/interactive-application-2:v1.0
           ports:
             - containerPort: 80
 EOF
@@ -271,21 +271,21 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: app1-nginx-nodeport-service
+                name: app2-nginx-nodeport-service
                 port: 
                   number: 80
           - path: /app2
             pathType: Prefix
             backend:
               service:
-                name: app2-nginx-nodeport-service
+                name: app3-nginx-nodeport-service
                 port: 
                   number: 80
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: app3-nginx-nodeport-service
+                name: app1-nginx-nodeport-service
                 port: 
                   number: 80              
 EOF
