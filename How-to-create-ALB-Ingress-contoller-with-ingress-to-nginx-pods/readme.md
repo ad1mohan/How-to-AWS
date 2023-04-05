@@ -76,9 +76,10 @@ helm repo add eks https://aws.github.io/eks-charts
 
 # Update your local repo to make sure that you have the most recent charts.
 helm repo update
-```
-Change below `<VPC_ID>` with vpc id in which cluster is created.
-```
+
+vpc_id=$(aws eks describe-cluster --name test-cluster-1 --query "cluster.resourcesVpcConfig.vpcId" --output text)
+
+
 # To install aws lb controller
 ## Replace Cluster Name, Region Code, VPC ID, Image Repo Account ID and Region Code  
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
@@ -87,13 +88,13 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   --set serviceAccount.create=false \
   --set serviceAccount.name=aws-load-balancer-controller \
   --set region=us-east-1 \
-  --set vpcId=vpc-<VPC_ID> \
+  --set vpcId=$vpc_id \
   --set image.repository=602401143452.dkr.ecr.us-east-1.amazonaws.com/amazon/aws-load-balancer-controller
 
-```
+
 
 Below are files used to create deployments and LBs
-```
+
 # To create a folder to keep yamls
 mkdir ./yamls
 
