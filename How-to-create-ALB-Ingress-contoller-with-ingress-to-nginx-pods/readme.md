@@ -19,7 +19,7 @@ eksctl utils associate-iam-oidc-provider \
    --approve
 
 # To create a keypair named kube-kp
-aws ec2 create-key-pair --key-name kube-kp
+aws ec2 create-key-pair --key-name kube-kp --query=KeyMaterial --output=text > kube-kp.pem
 
 # To create a private Node Group with key-pair (kube-kp) and instnace type 't2.micro'.
 eksctl create nodegroup --cluster=test-cluster-1 \
